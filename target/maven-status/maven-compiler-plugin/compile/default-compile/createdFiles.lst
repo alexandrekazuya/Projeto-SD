@@ -1,0 +1,10 @@
+googol\downloader\PageInfo.class
+googol\common\dto\PageDTO.class
+googol\barrel\Barrel.class
+googol\common\dto\SearchResult.class
+googol\downloader\Downloader.class
+googol\gateway\Gateway.class
+googol\downloader\InvertedIndex.class
+googol\common\BarrelService.class
+googol\common\GatewayService.class
+googol\client\ClientCLI.class

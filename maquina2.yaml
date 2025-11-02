@@ -1,0 +1,59 @@
+services:
+  barrel2:
+    build: .
+    container_name: barrel2
+    hostname: m2
+    stop_grace_period: 10s
+    environment:
+      HOST_GATEWAY: host.docker.internal
+      HOST_BARREL1: localhost
+      HOST_BARREL2: host.docker.internal
+      RMI_HOSTNAME: host.docker.internal
+    volumes:
+      - ./barrel.properties:/app/barrel.properties:ro
+      - ./Barrel2_index.txt:/app/Barrel2_index.txt
+    ports:
+      - "1100:1099"   # host:1100 -> container:1099 (Barrel2 registry)
+      - "2001:2001"   # host:2001 -> container:2001 (Barrel2 object port)
+    networks:
+      - googol-network
+    command: java -cp /app/classes:/app/libs/* googol.barrel.Barrel
+
+  downloader2:
+    build: .
+    container_name: downloader2
+    environment:
+      HOST_GATEWAY: host.docker.internal
+      HOST_BARREL1: host.docker.internal
+      HOST_BARREL2: barrel2
+      PORT_BARREL2: "1099"
+    volumes:
+      - ./downloader.properties:/app/downloader.properties:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - googol-network
+    depends_on:
+      barrel2:
+        condition: service_started
+    command: java -cp /app/classes:/app/libs/* googol.downloader.Downloader
+
+  client:
+    build: .
+    container_name: client
+    environment:
+      HOST_GATEWAY: host.docker.internal
+      PORT_GATEWAY: "1099"
+      TERM: xterm
+    volumes:
+      - ./client.properties:/app/client.properties:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    stdin_open: true
+    tty: true
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["exec java -cp /app/classes:/app/libs/* googol.client.ClientCLI"]
+
+networks:
+  googol-network:
+    driver: bridge
