@@ -88,6 +88,8 @@ Quando um Barrel reinicia, o seu objeto remoto ganha um novo ID. As proxies anti
 Não implementado. O sistema atual faz um envio best‑effort para dois Barrels (quando disponíveis), mas não há multicast fiável.
 Em caso de falha durante o envio, a recuperação é feita por tentativas ponto‑a‑ponto.
 
+No entanto, os barrels têm a mesma informação até um ser morto. A partir daí estão dessincronizado.
+
 
 ## Crash handler do Barrel
 
