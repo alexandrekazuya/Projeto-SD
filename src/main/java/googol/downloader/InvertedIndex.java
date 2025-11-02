@@ -101,32 +101,12 @@ public class InvertedIndex {
         return t.substring(0, 100) + "...";
     }
 
-    //save data (atomic write: tmp file + move)
+    //save data
     public synchronized void saveToDisk(String filePath) throws IOException {
-        java.nio.file.Path target = java.nio.file.Paths.get(filePath);
-        java.nio.file.Path tmp = target.resolveSibling(target.getFileName().toString() + ".tmp");
-
-        try (FileOutputStream fos = new FileOutputStream(tmp.toFile());
-             java.io.BufferedOutputStream bos = new java.io.BufferedOutputStream(fos);
-             ObjectOutputStream out = new ObjectOutputStream(bos)) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath))) {
             out.writeObject(pages);
             out.writeObject(indexedItems);
             out.writeObject(incomingLinks);
-            out.flush();
-            fos.getFD().sync(); // fsync to reduce truncation risk
-        } catch (IOException ioe) {
-            // best effort cleanup tmp
-            try { java.nio.file.Files.deleteIfExists(tmp); } catch (Exception ignore) {}
-            throw ioe;
-        }
-
-        try {
-            java.nio.file.Files.move(tmp, target,
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
-                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
-        } catch (java.nio.file.AtomicMoveNotSupportedException e) {
-            // fallback without atomic if FS doesn't support it
-            java.nio.file.Files.move(tmp, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
@@ -141,10 +121,6 @@ public class InvertedIndex {
             pages.putAll((Map<String, PageInfo>) in.readObject());
             indexedItems.putAll((Map<String, Set<String>>) in.readObject());
             incomingLinks.putAll((Map<String, Set<String>>) in.readObject());
-        } catch (java.io.EOFException | java.io.StreamCorruptedException e) {
-            // Likely truncated/empty/corrupt file: remove and start fresh
-            try { java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(filePath)); } catch (Exception ignore) {}
-            throw new IOException("Corrupt or incomplete index file removed (will rebuild): " + e.getClass().getSimpleName(), e);
         } catch (ClassNotFoundException e) {
             throw new IOException("Failed to load index: " + e.getMessage(), e);
         }
