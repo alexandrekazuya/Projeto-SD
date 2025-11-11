@@ -91,7 +91,7 @@ public class Gateway extends UnicastRemoteObject implements GatewayService {
             } catch (RemoteException e) {
                 System.err.println("search failed on " + bName + ": " + e.getMessage());
                 
-                try {
+                try { //em vez de repetir codigo, fazer um while que tenta até conseguir
                     Registry reg = LocateRegistry.getRegistry(barrelHosts.get(i), barrelPorts.get(i));
                     BarrelService newBarrelProxy = (BarrelService) reg.lookup(bName);
                     barrels.set(i, newBarrelProxy);

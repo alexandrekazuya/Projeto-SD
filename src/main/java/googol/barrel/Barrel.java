@@ -125,7 +125,7 @@ public class Barrel extends UnicastRemoteObject implements BarrelService {
                 barrel.indexedItems.loadFromDisk(barrel.dataFile);
                 System.out.println("[Barrel] Loaded " + barrel.indexedItems.totalPages());
             } catch (Exception e) {
-                System.out.println("Não consigo ler o ficheiro, sou retarded as shi");
+                System.out.println("Não consigo ler o ficheiro, ye");
             }
 
             //hook para dar save ao index quando levar shutdown

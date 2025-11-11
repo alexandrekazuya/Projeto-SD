@@ -109,17 +109,11 @@ Foram realizados os seguintes testes de tolerância a falhas e recuperação:
 | Cenário de teste | Passou? | Observações |
 |------------------|-----------|-------------|
 | Matar um Barrel e voltar a ligar | Sim | O sistema deteta a falha, faz relookup do Barrel no Registry e restabelece a ligação automaticamente |
-
 | Matar um Downloader e voltar a ligar | Sim | O Downloader tenta reconectar-se quando a Gateway ou Barrels falham  |
-
 | Matar o Gateway e voltar a ligar | Sim | Cliente e Downloaders fazem relookup quando a Gateway volta |
-
 | Barrels guardam dados quando morrem | Sim | Os dados index, pages e incomingLinks são guardados no ficheiro quando os barrels fecham |
-
 | Downloader/Gateway guardam dados quando morrem | Não | Os dados em memória (queue de Urls) são perdidos |
-
 | Gateway continua a pesquisa quando Barrel falha, procurando num novo | Sim |
-
 | Downloader continua sem Barrels | Não (espera que haja um) | O Downloader bloqueia e aguarda até que pelo menos um Barrel esteja disponível antes de continuar |
 
 ## Distribuição de tarefas
