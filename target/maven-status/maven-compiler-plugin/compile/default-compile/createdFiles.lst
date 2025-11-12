@@ -1,9 +1,11 @@
 googol\downloader\PageInfo.class
+googol\gateway\Gateway$ClientNotification.class
 googol\common\dto\PageDTO.class
 googol\barrel\Barrel.class
 googol\common\dto\SearchResult.class
 googol\downloader\Downloader.class
 googol\gateway\Gateway.class
+googol\common\ClientCallback.class
 googol\downloader\InvertedIndex.class
 googol\common\BarrelService.class
 googol\common\GatewayService.class

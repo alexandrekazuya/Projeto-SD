@@ -44,9 +44,16 @@ services:
     environment:
       HOST_GATEWAY: host.docker.internal
       PORT_GATEWAY: "1099"
+      # Use your PC's hostname or IP. For localhost access from host, use:
+      # - Windows/Mac Docker Desktop: host.docker.internal or localhost work
+      # - For Gateway on host PC to reach container: localhost (because port is mapped)
+      RMI_HOSTNAME: 127.0.0.1
+      CLIENT_CALLBACK_PORT: "3000"
       TERM: xterm
     volumes:
       - ./client.properties:/app/client.properties:ro
+    ports:
+      - "3000:3000"   # host:3000 -> container:3000 (Client callback port)
     extra_hosts:
       - "host.docker.internal:host-gateway"
     stdin_open: true

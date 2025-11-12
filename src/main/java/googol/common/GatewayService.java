@@ -10,5 +10,8 @@ public interface GatewayService extends Remote {
     String[] getIncomingLinks(String url) throws RemoteException;
     void putNewURL(String url) throws RemoteException;
     String takeNext() throws RemoteException;
-    //StatsDTO getStats() throws RemoteException;
+    
+    // Client callback registration for real-time stats updates
+    void registerClient(ClientCallback client) throws RemoteException;
+    void unregisterClient(ClientCallback client) throws RemoteException;
 }

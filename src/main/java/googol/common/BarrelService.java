@@ -11,5 +11,5 @@ public interface BarrelService extends Remote {
     void sendPage(PageDTO page) throws RemoteException;//downloader -> barrel
     SearchResult[] searchWord(String[] terms, int page) throws RemoteException;
     String[] getIncomingLinks(String url) throws RemoteException;
-    //StatsDTO getStats() throws RemoteException;
+    int getIndexSize() throws RemoteException;
 }

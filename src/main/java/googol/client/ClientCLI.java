@@ -3,18 +3,97 @@ package googol.client;
 import java.io.FileInputStream;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 
+import googol.common.ClientCallback;
 import googol.common.GatewayService;
 import googol.common.dto.SearchResult;
 
-public class ClientCLI {
+public class ClientCLI extends UnicastRemoteObject implements ClientCallback {
     private static String hostGateway;
     private static int portGateway;
     private static GatewayService gateway;
     private static int connectionRetries;
     private static int retryDelay;
+    
+    // Stats tracking
+    private static String[][] top10Searches = new String[0][0];
+    private static Map<String, Integer> barrelStatus = Map.of();
+    private static Map<String, Double> responseTimes = Map.of();
+    
+    public ClientCLI() throws RemoteException {
+        super(getClientCallbackPort());
+    }
+    
+    private static int getClientCallbackPort() {
+        String portStr = System.getenv("CLIENT_CALLBACK_PORT");
+        if (portStr != null && !portStr.isBlank()) {
+            try {
+                int port = Integer.parseInt(portStr);
+                System.out.println("[Client] Exporting callback object on port: " + port);
+                return port;
+            } catch (NumberFormatException e) {
+                System.err.println("[Client] Invalid CLIENT_CALLBACK_PORT, using default (0): " + e.getMessage());
+            }
+        }
+        System.out.println("[Client] No CLIENT_CALLBACK_PORT specified, using random port");
+        return 0; // Random port
+    }
+    
+    @Override
+    public void updateTop10Searches(String[][] top10) throws RemoteException {
+        top10Searches = top10;
+        
+        // Print all stats together when top10 updates
+        System.out.println("\n------------STATS------------");
+        
+        // Top 10 searches
+        System.out.println("\n---- top10-----");
+        if (top10.length == 0) {
+            System.out.println("  (no searches yet)");
+        } else {
+            for (int i = 0; i < top10.length; i++) {
+                System.out.printf("  %2d. %s (%s searches)%n", i + 1, top10[i][0], top10[i][1]);
+            }
+        }
+        
+        // Barrel status
+        System.out.println("\n------Active Barrels---");
+        if (barrelStatus.isEmpty()) {
+            System.out.println("  (no barrels active)");
+        } else {
+            for (Map.Entry<String, Integer> entry : barrelStatus.entrySet()) {
+                System.out.printf("  %s: %d pages indexed%n", entry.getKey(), entry.getValue());
+            }
+        }
+        
+        // Average response times
+        System.out.println("\n-----avg time-----");
+        if (responseTimes.isEmpty()) {
+            System.out.println("  (no data yet)");
+        } else {
+            for (Map.Entry<String, Double> entry : responseTimes.entrySet()) {
+                System.out.printf("  %s: %.1f ds%n", entry.getKey(), entry.getValue());
+            }
+        }
+        
+        System.out.println("\n-------------------------\n");
+    }
+    
+    @Override
+    public void updateBarrelStatus(Map<String, Integer> barrelStats) throws RemoteException {
+        barrelStatus = barrelStats;
+        // Store silently, will be printed when top10 updates
+    }
+    
+    @Override
+    public void updateResponseTimes(Map<String, Double> times) throws RemoteException {
+        responseTimes = times;
+        // Store silently, will be printed when top10 updates
+    }
 
     private static void reconnectGateway() throws Exception {
         int retries = connectionRetries;
@@ -52,13 +131,39 @@ public class ClientCLI {
             retryDelay = Integer.parseInt(cfg.getProperty("connection.retryDelay", "2000"));
 
             reconnectGateway();
+            
+            // Set RMI hostname for callbacks - use environment variable or default to localhost
+            String rmiHostname = System.getenv().getOrDefault("RMI_HOSTNAME", "localhost");
+            System.setProperty("java.rmi.server.hostname", rmiHostname);
+            System.out.println("[Client] RMI hostname set to: " + rmiHostname);
+            
+            ClientCLI client = new ClientCLI();
+            
+            try {
+                gateway.registerClient(client);
+                System.out.println("[Client] Registered for real-time stats updates");
+            } catch (Exception e) {
+                System.err.println("[Client] Failed to register for stats: " + e.getMessage());
+            }
+            
             System.out.println("Connected. Commands: search <terms> | incoming <url> | putNew <url> | exit");
 
             while (true) {
                 System.out.print("Commands: search <terms> | incoming <url> | putNew <url> | exit");
                 System.out.print("\n> ");
                 String line = in.nextLine().trim();
-                if (line.equalsIgnoreCase("exit")) break;
+                
+                if (line.equalsIgnoreCase("exit")) {
+                    try {
+                        gateway.unregisterClient(client);
+                        System.out.println("[Client] Unregistered from stats updates");
+                    } catch (Exception e) {
+                        System.err.println("[Client] Failed to unregister: " + e.getMessage());
+                    }
+                    System.out.println("exiting..");
+                    break;
+                }
+                
                 if (line.isBlank()) continue;
 
                 try {
@@ -117,7 +222,8 @@ public class ClientCLI {
                         System.err.println("[Client] Client continues running...");
                     }
                 } catch (Exception e) {
-                    System.err.println("Error processing command: " + e.getMessage());
+                    System.err.println("Error processing command: " + e.getClass().getName() + " - " + e.getMessage());
+                    e.printStackTrace();
                     System.err.println("Client continues running...");
                 }
             }

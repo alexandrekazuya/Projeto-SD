@@ -88,6 +88,12 @@ public class Barrel extends UnicastRemoteObject implements BarrelService {
         System.out.println("[Barrel] Found " + incoming.size() + " incoming links");
         return incoming.toArray(String[]::new);
     }
+    
+    //gateway -> barrel: get index size for stats
+    @Override
+    public int getIndexSize() throws RemoteException {
+        return indexedItems.totalPages();
+    }
 
     public static void main(String[] args) {
         try {
