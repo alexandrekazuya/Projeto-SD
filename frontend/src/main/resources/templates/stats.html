@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Stats</title>
+</head>
+<body style="font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:2rem;">
+    <h1>Stats</h1>
+    <div th:if="${error}">
+        <p style="color:red;">Error: <span th:text="${error}"></span></p>
+    </div>
+    <h2>Top 10 Searches</h2>
+    <pre id="leaderboardContent" style="white-space:pre-wrap; background:#f7f7f7; padding:1rem; border-radius:6px;"></pre>
+
+    <h2 style="margin-top:1.5rem;">Barrel Status / Response Times</h2>
+    <pre id="barrelContent" style="white-space:pre-wrap; background:#f7f7f7; padding:1rem; border-radius:6px;"></pre>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+    (function(){
+        const socket = new SockJS('/my-websocket');
+        const stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+
+        function stripPlainPrefix(body){
+            if(!body) return '';
+            if(body.startsWith('PLAINV1:')) return body.substring('PLAINV1:'.length);
+            return body;
+        }
+
+        function showStats(stats) {
+            const lines = (stats || '').split('\n');
+
+            const leaderboardLines = [];
+            const barrelLines = [];
+
+            let isBarrel = false;
+            for (let line of lines) {
+                if (!line) continue;
+                if (line.includes('BARREL ANSWER TIME')) {
+                    isBarrel = true;
+                    continue;
+                }
+                if (isBarrel) barrelLines.push(line);
+                else leaderboardLines.push(line);
+            }
+
+            document.getElementById('leaderboardContent').textContent = leaderboardLines.join('\n');
+            document.getElementById('barrelContent').textContent = barrelLines.join('\n');
+        }
+
+        function onMessage(body){
+            const plain = stripPlainPrefix(body || '');
+            showStats(plain);
+        }
+
+        stompClient.connect({}, function(){
+            stompClient.subscribe('/topic/top10', function(message){
+                onMessage(message.body);
+            });
+
+            stompClient.send('/app/stats/refresh', {}, {});
+            
+        }, function(){
+            setTimeout(() => location.reload(), 1000);
+        });
+    })();
+    </script>
+
+    <a href="/" style="display:inline-block; margin-top:2rem; padding:0.5rem 1rem; background:#eee; border-radius:4px; text-decoration:none; color:#333;">Back to Index</a>
+</body>
+</html>
