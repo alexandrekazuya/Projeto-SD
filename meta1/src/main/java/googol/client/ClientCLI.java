@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 
-import googol.common.ClientCallback;
+import googol.common.SimpleClientCallback;
 import googol.common.GatewayService;
 import googol.common.dto.SearchResult;
 
-public class ClientCLI extends UnicastRemoteObject implements ClientCallback {
+public class ClientCLI extends UnicastRemoteObject implements SimpleClientCallback {
     private static String hostGateway;
     private static int portGateway;
     private static GatewayService gateway;
@@ -44,55 +44,12 @@ public class ClientCLI extends UnicastRemoteObject implements ClientCallback {
     }
     
     @Override
-    public void updateTop10Searches(String[][] top10) throws RemoteException {
-        top10Searches = top10;
-        
-        // Print all stats together when top10 updates
-        System.out.println("\n------------STATS------------");
-        
-        // Top 10 searches
-        System.out.println("\n---- top10-----");
-        if (top10.length == 0) {
-            System.out.println("  (no searches yet)");
-        } else {
-            for (int i = 0; i < top10.length; i++) {
-                System.out.printf("  %2d. %s (%s searches)%n", i + 1, top10[i][0], top10[i][1]);
-            }
-        }
-        
-        // Barrel status
-        System.out.println("\n------Active Barrels---");
-        if (barrelStatus.isEmpty()) {
-            System.out.println("  (no barrels active)");
-        } else {
-            for (Map.Entry<String, Integer> entry : barrelStatus.entrySet()) {
-                System.out.printf("  %s: %d pages indexed%n", entry.getKey(), entry.getValue());
-            }
-        }
-        
-        // Average response times
-        System.out.println("\n-----avg time-----");
-        if (responseTimes.isEmpty()) {
-            System.out.println("  (no data yet)");
-        } else {
-            for (Map.Entry<String, Double> entry : responseTimes.entrySet()) {
-                System.out.printf("  %s: %.1f ds%n", entry.getKey(), entry.getValue());
-            }
-        }
-        
-        System.out.println("\n-------------------------\n");
-    }
-    
-    @Override
-    public void updateBarrelStatus(Map<String, Integer> barrelStats) throws RemoteException {
-        barrelStatus = barrelStats;
-        // Store silently, will be printed when top10 updates
-    }
-    
-    @Override
-    public void updateResponseTimes(Map<String, Double> times) throws RemoteException {
-        responseTimes = times;
-        // Store silently, will be printed when top10 updates
+    public void updateStatsString(String stats) throws RemoteException {
+        // Gateway provides the fully formatted plain-text stats string.
+        // Print it as received.
+        System.out.println("\n------------STATS (raw)------------");
+        System.out.println(stats == null ? "" : stats);
+        System.out.println("-------------------------\n");
     }
 
     private static void reconnectGateway() throws Exception {

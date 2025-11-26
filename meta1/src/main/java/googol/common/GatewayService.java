@@ -12,6 +12,13 @@ public interface GatewayService extends Remote {
     String takeNext() throws RemoteException;
     
     // Client callback registration for real-time stats updates
-    void registerClient(ClientCallback client) throws RemoteException;
-    void unregisterClient(ClientCallback client) throws RemoteException;
+    void registerClient(SimpleClientCallback client) throws RemoteException;
+    void unregisterClient(SimpleClientCallback client) throws RemoteException;
+
+    // Stats methods for frontend
+    String[][] getTop10Searches() throws RemoteException;
+    java.util.Map<String, Integer> getBarrelStatus() throws RemoteException;
+    java.util.Map<String, Double> getAverageResponseTimes() throws RemoteException;
+    // Return the pre-formatted plain-text stats string (leaderboard + separator + barrels)
+    String getPlainStatsString() throws RemoteException;
 }
