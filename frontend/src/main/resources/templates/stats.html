@@ -6,17 +6,16 @@
     <title>Stats</title>
 </head>
 
-<body style="font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:2rem;">
+<body>
     <h1>Stats</h1>
     <div th:if="${error}">
-        <p style="color:red;">Error: <span th:text="${error}"></span></p>
+        <p>Error: <span th:text="${error}"></span></p>
     </div>
     <h2>Top 10 Searches</h2>
-    <pre id="leaderboardContent"
-        style="white-space:pre-wrap; background:#f7f7f7; padding:1rem; border-radius:6px;"></pre>
+    <pre id="top10Content"></pre>
 
-    <h2 style="margin-top:1.5rem;">Barrel Status / Response Times</h2>
-    <pre id="barrelContent" style="white-space:pre-wrap; background:#f7f7f7; padding:1rem; border-radius:6px;"></pre>
+    <h2>Barrel Status / Response Times</h2>
+    <pre id="barrelContent"></pre>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <script>
@@ -34,7 +33,7 @@
             function showStats(stats) {
                 const lines = (stats || '').split('\n');
 
-                const leaderboardLines = [];
+                const top10Lines = [];
                 const barrelLines = [];
 
                 let isBarrel = false;
@@ -45,10 +44,10 @@
                         continue;
                     }
                     if (isBarrel) barrelLines.push(line);
-                    else leaderboardLines.push(line);
+                    else top10Lines.push(line);
                 }
 
-                document.getElementById('leaderboardContent').textContent = leaderboardLines.join('\n');
+                document.getElementById('top10Content').textContent = top10Lines.join('\n');
                 document.getElementById('barrelContent').textContent = barrelLines.join('\n');
             }
 
@@ -64,15 +63,11 @@
 
                 stompClient.send('/app/stats/refresh', {}, {});
 
-            }, function () {
-                setTimeout(() => location.reload(), 1000);
             });
         })();
     </script>
 
-    <a href="/"
-        style="display:inline-block; margin-top:2rem; padding:0.5rem 1rem; background:#eee; border-radius:4px; text-decoration:none; color:#333;">Back
-        to Index</a>
+    <a href="/">Return</a>
 </body>
 
 </html>

@@ -16,25 +16,22 @@ public class RegisterClient {
 
     @Autowired
     private WebSocketPushController pushController;
-
+    
     @Value("${gateway.host}")
     private String gatewayHost;
 
     @Autowired
+    private GatewayServ gateway;
+
     @PostConstruct
     public void registerClient() {
-        System.out.println("[RegisterClient] Attempting RMI registration to gateway host: " + gatewayHost + ":1099");
         try {
             WebSocketClientRMI client = new WebSocketClientRMI(pushController);
             Registry registry = LocateRegistry.getRegistry(gatewayHost, 1099);
-            GatewayService gw = (GatewayService) registry.lookup("Gateway");
+            GatewayService gw = (GatewayService) registry.lookup(   "Gateway");
             gw.registerClient(client);
-            System.out.println(
-                    "[RegisterClient] Successfully registered RMI client with gateway at " + gatewayHost + ":1099");
+            
         } catch (Exception e) {
-            System.err.println("[RegisterClient] Failed to register with gateway: " + e.getClass().getName() + " - "
-                    + e.getMessage());
-            e.printStackTrace(System.err);
         }
     }
 }

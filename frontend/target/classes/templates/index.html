@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Frontend Main</title>
+  <title>Main Page</title>
 </head>
-<body style="font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:2rem;">
-  <h1>Frontend Main Page</h1>
 
-  <form method="post" action="/putNew" style="margin-bottom:2rem;">
-    <input type="text" name="url" placeholder="Enter URL to add" style="width:400px; padding:0.5rem; font-size:1.2rem;" required>
-    <button type="submit" style="padding:0.5rem 1rem; font-size:1.1rem;">Add URL</button>
+<body>
+  <h1>Main Page</h1>
+
+  <form method="post" action="/putNew">
+    <input type="text" name="url" placeholder="Enter URL to add" required>
+    <button type="submit">Add URL</button>
   </form>
 
-  <form method="get" action="/search" style="margin-bottom:2rem;">
-    <input type="text" name="q" placeholder="Search terms (comma separated)" style="width:400px; padding:0.5rem; font-size:1.2rem;" required>
-    <input type="number" name="page" value="1" min="1" style="width:60px; padding:0.5rem; font-size:1.1rem;">
-    <button type="submit" style="padding:0.5rem 1rem; font-size:1.1rem;">Search</button>
+  <form method="get" action="/search">
+    <input type="text" name="q" placeholder="Search terms (comma separated)" required>
+    <input type="hidden" name="page" value="1">
+    <button type="submit">Search</button>
   </form>
 
-  <a href="/stats/" style="display:inline-block; margin-bottom:1rem; padding:0.6rem 1rem; background:#007bff; color:#fff; border-radius:6px; text-decoration:none;">View Stats</a>
+  <a href="/stats/">View Stats</a>
 
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </body>
+
 </html>
