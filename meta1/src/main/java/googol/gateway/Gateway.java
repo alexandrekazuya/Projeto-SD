@@ -41,6 +41,8 @@ public class Gateway extends UnicastRemoteObject implements GatewayService {
     private final Map<String, Long> barrelTotalTime = new ConcurrentHashMap<>();
     private final Map<String, Long> barrelSearchCount = new ConcurrentHashMap<>();
     private String[][] currentTop10 = new String[0][0];
+    private String lastStatsString = "";
+    private long lastStatsUpdate = 0;
 
     public Gateway(Properties cfg) throws Exception {
         try {
@@ -208,11 +210,13 @@ public class Gateway extends UnicastRemoteObject implements GatewayService {
          * }
          */
         urlsToIndex.add(u);
+        checkForStatsUpdates();
     }
 
     // downloader-> gateway: takeNext
     @Override
     public String takeNext() throws RemoteException {
+        checkForStatsUpdates();
         return urlsToIndex.poll();
     }
 
@@ -255,7 +259,7 @@ public class Gateway extends UnicastRemoteObject implements GatewayService {
     private void trackBarrelStats(String barrelName, long elapsed) {
         barrelTotalTime.put(barrelName, barrelTotalTime.getOrDefault(barrelName, 0L) + elapsed);
         barrelSearchCount.put(barrelName, barrelSearchCount.getOrDefault(barrelName, 0L) + 1);
-        updateTop10IfChanged();
+        checkForStatsUpdates();
     }
 
     // ir buscar um map: barrel name -> index size
@@ -288,7 +292,16 @@ public class Gateway extends UnicastRemoteObject implements GatewayService {
         return avgTimes;
     }
 
-    private void updateTop10IfChanged() {
+    // synchronized pq varias threads podem querer chamar isto ao mm tempo
+    private synchronized void checkForStatsUpdates() {
+        // se ainda nao passaram 500ms desde a ultima vez que foi chamada, nao faz nada,
+        // para evitar que a gateway envie muitas vezes
+        long now = System.currentTimeMillis();
+        if (now - lastStatsUpdate < 500) {
+            return;
+        }
+        lastStatsUpdate = now;
+
         List<Map.Entry<String, Long>> entries = new ArrayList<>(searchCounters.entrySet());
         entries.sort((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()));
 
@@ -301,17 +314,15 @@ public class Gateway extends UnicastRemoteObject implements GatewayService {
             newTop10[i][1] = String.valueOf(entry.getValue());// value é o count
         }
 
-        String oldStr = java.util.Arrays.deepToString(currentTop10);
-        String newStr = java.util.Arrays.deepToString(newTop10);
+        Map<String, Integer> barrelStatus = getBarrelStatus();
+        Map<String, Double> responseTimes = getAverageResponseTimes();
 
-        if (!oldStr.equals(newStr)) {
+        String newStatsString = buildPlainStatsString(newTop10, barrelStatus, responseTimes);
+
+        if (!newStatsString.equals(lastStatsString)) {
             currentTop10 = newTop10;
-            Map<String, Integer> barrelStatus = getBarrelStatus();
-            Map<String, Double> responseTimes = getAverageResponseTimes();
-
-            String statsString = buildPlainStatsString(newTop10, barrelStatus, responseTimes);
-
-            notifyClients(client -> client.updateStatsString(statsString));
+            lastStatsString = newStatsString;
+            notifyClients(client -> client.updateStatsString(newStatsString));
         }
     }
 

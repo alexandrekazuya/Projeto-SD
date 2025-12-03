@@ -1,7 +1,6 @@
 # TODO
 
-## Consultar lista de páginas com ligação para uma página específica. 
-É possível saber, para cada página, todas as ligações conhecidas que apontem para essa página. Esta funcionalidade pode estar associada à funcionalidade de pesquisa (por exemplo, uma opção associada a cada resultado).
+## FIX TEMPO REAL TAMANHO BARREL
 
 ## HackerNews e OpenAI
 6 Este projeto deverá ser integrado com o Hacker News e com a OpenAI, ou qualquer alternativa equivalente que utilize REST. As documentações da APIs estão disponíveis em

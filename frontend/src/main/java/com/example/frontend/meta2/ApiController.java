@@ -22,10 +22,11 @@ public class ApiController {
 	}
 
 	@GetMapping("/search")
-	public String searchPage(@RequestParam(value = "q", defaultValue="") String query,
-							@RequestParam(value = "page", defaultValue = "1") int page,
-							Model model) {
-		if (query == null) query = "";
+	public String searchPage(@RequestParam(value = "q", defaultValue = "") String query,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			Model model) {
+		if (query == null)
+			query = "";
 		try {
 			String[] termArr = query.split(",");
 			SearchResult[] results = gatewayServ.getGateway().searchWord(termArr, page);
@@ -36,6 +37,18 @@ public class ApiController {
 			model.addAttribute("error", e.getMessage());
 		}
 		return "search";
+	}
+
+	@GetMapping("/search/incoming")
+	public String searchIncoming(@RequestParam("url") String url, Model model) {
+		try {
+			String[] incomingLinks = gatewayServ.getGateway().getIncomingLinks(url);
+			model.addAttribute("incomingLinks", incomingLinks);
+			model.addAttribute("url", url);
+		} catch (Exception e) {
+			model.addAttribute("error", e.getMessage());
+		}
+		return "searchinc";
 	}
 
 	@PostMapping("/putNew")
@@ -52,13 +65,13 @@ public class ApiController {
 		return "stats";
 	}
 
-    @MessageMapping("/stats/refresh")
-    @SendTo("/topic/top10")
+	@MessageMapping("/stats/refresh")
+	@SendTo("/topic/top10")
 	public String refreshStats() {
-    try {
-        return gatewayServ.getGateway().getPlainStatsString();
-    } catch (Exception e) {
-        return "";
-    }
-}
+		try {
+			return gatewayServ.getGateway().getPlainStatsString();
+		} catch (Exception e) {
+			return "";
+		}
+	}
 }

@@ -16,7 +16,7 @@ public class RegisterClient {
 
     @Autowired
     private WebSocketPushController pushController;
-    
+
     @Value("${gateway.host}")
     private String gatewayHost;
 
@@ -28,9 +28,9 @@ public class RegisterClient {
         try {
             WebSocketClientRMI client = new WebSocketClientRMI(pushController);
             Registry registry = LocateRegistry.getRegistry(gatewayHost, 1099);
-            GatewayService gw = (GatewayService) registry.lookup(   "Gateway");
+            GatewayService gw = (GatewayService) registry.lookup("Gateway");
             gw.registerClient(client);
-            
+
         } catch (Exception e) {
         }
     }

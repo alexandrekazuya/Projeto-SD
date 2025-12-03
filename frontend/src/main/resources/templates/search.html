@@ -15,7 +15,9 @@
     <div th:if="${results}">
         <ul>
             <li th:each="result : ${results}">
-                <span th:text="${result.url}"></span> - <span th:text="${result.title}"></span>
+                <a th:href="@{/search/incoming(url=${result.url})}">
+                    <span th:text="${result.url}"></span>
+                </a> - <span th:text="${result.title}"></span>
             </li>
         </ul>
         <div>
