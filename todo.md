@@ -1,7 +1,5 @@
 # TODO
 
-## FIX TEMPO REAL TAMANHO BARREL
-
 ## HackerNews e OpenAI
 6 Este projeto deverá ser integrado com o Hacker News e com a OpenAI, ou qualquer alternativa equivalente que utilize REST. As documentações da APIs estão disponíveis em
 https://github.com/HackerNews/API e https://platform.openai.com/docs/api-reference/
@@ -15,5 +13,10 @@ utilizador com conta no Hacker News peça ao Googol para ir buscar todas as suas
 ser acrescentada à página de resultados do Googol uma análise textual baseada
 nos termos da pesquisa e/ou nas citações curtas dos resultados da pesquisa. Poderão igualmente usar uma qualquer alternativa à OpenAI, desde que seja usada
 uma API REST
+
+ideia para o hacker news, fazer um search dos urls como se fosse um putNew e dps ver no body se tem a palavra q metemos a pesquisar.
+
+ideia para o open ai
+
 
 ## Relatório
