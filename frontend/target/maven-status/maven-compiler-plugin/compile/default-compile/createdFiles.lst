@@ -1,7 +1,14 @@
-com\example\frontend\meta2\GatewayServ.class
+com\example\frontend\meta2\OpenAI\OpenAIService.class
 com\example\frontend\meta2\WebSocketConfig.class
 com\example\frontend\meta2\WebSocketPushController.class
+com\example\frontend\meta2\OpenAI\ChatResponse$Choice$Message.class
+com\example\frontend\meta2\HackerNews\HackerNewsController.class
+com\example\frontend\meta2\GatewayServ.class
 com\example\frontend\meta2\ApiController.class
 com\example\frontend\meta2\FrontendApplication.class
+com\example\frontend\meta2\OpenAI\ChatResponse.class
 com\example\frontend\meta2\WebSocketClientRMI.class
+com\example\frontend\meta2\OpenAI\ChatMessage.class
 com\example\frontend\meta2\RegisterClient.class
+com\example\frontend\meta2\OpenAI\ChatResponse$Choice.class
+com\example\frontend\meta2\OpenAI\ChatRequest.class

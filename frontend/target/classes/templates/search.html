@@ -12,6 +12,11 @@
         <input type="text" name="q" th:value="${query}" placeholder="Search terms" />
         <button type="submit">Search</button>
     </form>
+    <div th:if="${aiSummary}">
+        <h3>AI Answer</h3>
+        <p th:text="${aiSummary}"></p>
+    </div>
+
     <div th:if="${results}">
         <ul>
             <li th:each="result : ${results}">

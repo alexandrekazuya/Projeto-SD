@@ -9,12 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.frontend.meta2.OpenAI.OpenAIService;
 import googol.common.dto.SearchResult;
 
 @Controller
 public class ApiController {
 	@Autowired
 	private GatewayServ gatewayServ;
+
+	@Autowired
+	private OpenAIService openAIService;
 
 	@GetMapping("/")
 	public String mainPage() {
@@ -30,6 +34,12 @@ public class ApiController {
 		try {
 			String[] termArr = query.split(",");
 			SearchResult[] results = gatewayServ.getGateway().searchWord(termArr, page);
+
+			if (!query.isEmpty()) {
+				String summary = openAIService.getSummary(query);
+				model.addAttribute("aiSummary", summary);
+			}
+
 			model.addAttribute("results", results);
 			model.addAttribute("query", query);
 			model.addAttribute("page", page);
