@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Incoming Links</title>
+</head>
+
+<body>
+    <h1>Incoming Links for: <span th:text="${url}"></span></h1>
+
+    <div th:if="${incomingLinks}">
+        <ul>
+            <li th:each="link : ${incomingLinks}">
+                <span th:text="${link}"></span>
+            </li>
+        </ul>
+    </div>
+    <a href="/">Return to Home</a>
+</body>
+
+</html>

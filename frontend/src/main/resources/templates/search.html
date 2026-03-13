@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Search</title>
+</head>
+
+<body>
+    <h1>Search Results</h1>
+    <form th:action="@{/search}" method="get">
+        <input type="text" name="q" th:value="${query}" placeholder="Search terms" />
+        <button type="submit">Search</button>
+    </form>
+    <div th:if="${aiSummary}">
+        <h3>AI Answer</h3>
+        <p th:text="${aiSummary}"></p>
+    </div>
+
+    <div th:if="${results}">
+        <ul>
+            <li th:each="result : ${results}">
+                <a th:href="@{/search/incoming(url=${result.url})}">
+                    <span th:text="${result.url}"></span>
+                </a> - <span th:text="${result.title}"></span>
+            </li>
+        </ul>
+        <div>
+            <a th:if="${page > 1}" th:href="@{'/search'(q=${query}, page=${page - 1})}">
+                Previous
+            </a>
+            <span>Page <span th:text="${page}">1</span></span>
+            <a th:href="@{'/search'(q=${query}, page=${page + 1})}">
+                Next
+            </a>
+        </div>
+    </div>
+    <a href="/">Return</a>
+</body>
+
+</html>

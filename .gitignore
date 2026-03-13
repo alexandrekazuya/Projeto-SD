@@ -1,0 +1,10 @@
+target/
+/target
+meta1/target
+frontend/target
+*.class
+*.jar
+*.war
+*.ear
+
+*.log

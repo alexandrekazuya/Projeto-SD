@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Main Page</title>
+</head>
+
+<body>
+  <h1>Main Page</h1>
+
+  <form method="post" action="/putNew">
+    <input type="text" name="url" placeholder="Enter URL to add" required>
+    <button type="submit">Add URL</button>
+  </form>
+
+  <form method="get" action="/search">
+    <input type="text" name="q" placeholder="Search terms (comma separated)" required>
+    <input type="hidden" name="page" value="1">
+    <button type="submit">Search</button>
+  </form>
+
+  <a href="/stats/">View Stats</a>
+
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</body>
+
+</html>
